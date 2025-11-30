@@ -1,3 +1,6 @@
+.idea/
+App/Utilities/Instant_pictures_paste/Image.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
