@@ -19,13 +19,15 @@ def image_to_file():
     os.system(command)
 
 
-bindings = [
-    [ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Keybinding'), None, image_to_file, True],
-]
+def run():
+    bindings = [
+        [ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Keybinding'), None, image_to_file, True],
+    ]
+    global_hotkeys.register_hotkeys(bindings)
+    global_hotkeys.start_checking_hotkeys()
+    while True:  # sleep indefinitely
+        time.sleep(1)
 
-global_hotkeys.register_hotkeys(bindings)
 
-global_hotkeys.start_checking_hotkeys()
-
-while True:  # sleep indefinitely
-    time.sleep(1)
+if __name__ == "__main__":
+    run()
