@@ -20,7 +20,7 @@ def image_to_file():
 
 
 bindings = [
-    [ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Use'), None, image_to_file, True],
+    [ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Keybinding'), None, image_to_file, True],
 ]
 
 global_hotkeys.register_hotkeys(bindings)
