@@ -8,12 +8,12 @@ from App.internal_scripts import ConfigREST
 
 def image_to_file():
     im = ImageGrab.grabclipboard()
-    start_path = os.getcwd()
-    file_path = r'\Image.png'
-    full_path = start_path + file_path
+    start_path = Path(__file__).parents[0]
+    file_path = r'.\Image.png'
+    full_path = start_path.joinpath(file_path)
     try:
         im.save(full_path, 'PNG')
-    except IOError:
+    except (IOError, AttributeError):
         print("not an image")
     command = f'powershell Set-Clipboard -LiteralPath {full_path}'
     os.system(command)
