@@ -31,9 +31,10 @@ class ScriptsRunner:
             await self.run_script_async(item)
 
     async def run_script_async(self, item: str):
-        proc = await asyncio.create_subprocess_exec("python", f"./{item}/{item}.pyw")
-        self.processes[item] = proc
-        await proc.wait()
+        if item not in self.processes:
+            proc = await asyncio.create_subprocess_exec("python", f"./{item}/{item}.pyw")
+            self.processes[item] = proc
+            await proc.wait()
 
     def stop_all_scripts(self):
         for item in self.processes:
