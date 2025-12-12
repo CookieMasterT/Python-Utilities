@@ -3,7 +3,10 @@ import time
 from pathlib import Path
 import global_hotkeys
 from PIL import ImageGrab
-from App.internal_scripts import ConfigREST
+from App.InternalScripts.ConfigManagement import ConfigREST
+from App.InternalScripts.Logging import LoggerSrv
+
+logger = LoggerSrv.get_logger("InstaPicPaste", __name__)
 
 
 def image_to_file():
@@ -13,13 +16,15 @@ def image_to_file():
     full_path = start_path.joinpath(file_path)
     try:
         im.save(full_path, 'PNG')
+        logger.info(f"Succesfully saved {full_path}.png")
     except (IOError, AttributeError):
-        print("not an image")
+        logger.warn("Tried to convert, but the clipboard contained a non-image")
     command = f'powershell Set-Clipboard -LiteralPath {full_path}'
     os.system(command)
 
 
 def run():
+    logger.info("Running")
     bindings = [
         [ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Keybinding'), None, image_to_file, True],
     ]

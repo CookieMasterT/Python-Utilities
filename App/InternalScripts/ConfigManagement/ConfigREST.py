@@ -5,11 +5,15 @@ REST api - Representational State Transfer for managing both config files
 import json
 from pathlib import Path
 from typing import Union
+from App.InternalScripts.Logging import LoggerSrv
 
-CONFIGPATH = Path(__file__).parents[1].joinpath(r'.\config.json')
+
+CONFIGPATH = Path(__file__).parents[2].joinpath(r'.\config.json')
 DEFAULTCONFIGPATH = Path(__file__).parents[0].joinpath(r'.\default_config.json')
 
 LEGALJSONTYPES = Union[str | int | float | bool | list]
+
+logger = LoggerSrv.get_logger("ConfigREST", __name__)
 
 
 def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:
@@ -19,6 +23,7 @@ def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:
         "*" can be used as a wildcard symbol to fetch all options
     :param check_both: Whether to check "default_config.json" if the value doesn't exist
     """
+    logger.debug(f"Getting {resource}")
     if resource == "*":
         answer = _fetch_all_config(DEFAULTCONFIGPATH, CONFIGPATH)
     else:
@@ -60,6 +65,7 @@ def put(resource: str, value: LEGALJSONTYPES):
     :param resource: The resource to which to assign the value, example: "Utilities.InstaPicPaste.Use"
     :param value: The value to set the key to
     """
+    logger.debug(f"Setting {resource} to {value}")
     data = json.load(open(CONFIGPATH, "r"))
     data[resource] = value
     json.dump(data, open(CONFIGPATH, "w"))
@@ -72,6 +78,7 @@ def delete(resource: str):
         "*" can be used to delete ALL configuration
     :return:
     """
+    logger.debug(f"Deleting {resource}")
     if resource == "*":
         json.dump({}, open(CONFIGPATH, "w"))
     else:
