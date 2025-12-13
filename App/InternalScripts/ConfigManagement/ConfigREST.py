@@ -13,7 +13,7 @@ DEFAULTCONFIGPATH = Path(__file__).parents[0].joinpath(r'.\default_config.json')
 
 LEGALJSONTYPES = Union[str | int | float | bool | list]
 
-logger = LoggerSrv.get_logger("ConfigREST", __name__)
+logger = LoggerSrv.LoggerManager().get_logger("ConfigREST")
 
 
 def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:

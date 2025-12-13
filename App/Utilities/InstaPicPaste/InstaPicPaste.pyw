@@ -6,7 +6,7 @@ from PIL import ImageGrab
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
 
-logger = LoggerSrv.get_logger("InstaPicPaste", __name__)
+logger = LoggerSrv.LoggerManager().get_logger("InstaPicPaste")
 
 
 def image_to_file():
@@ -16,15 +16,15 @@ def image_to_file():
     full_path = start_path.joinpath(file_path)
     try:
         im.save(full_path, 'PNG')
-        logger.info(f"Succesfully saved {full_path}.png")
+        logger.info(f"Succesfully saved {full_path}")
     except (IOError, AttributeError):
-        logger.warn("Tried to convert, but the clipboard contained a non-image")
+        logger.warning("Tried to convert, but the clipboard contained a non-image")
     command = f'powershell Set-Clipboard -LiteralPath {full_path}'
     os.system(command)
 
 
 def run():
-    logger.info("Running")
+    logger.info("Started")
     bindings = [
         [ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Keybinding'), None, image_to_file, True],
     ]

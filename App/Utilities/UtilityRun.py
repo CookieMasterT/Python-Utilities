@@ -7,7 +7,7 @@ from App.InternalScripts.Logging import LoggerSrv
 
 class ScriptsRunner:
     processes = {}
-    logger = LoggerSrv.get_logger("ScriptsRunner", __name__)
+    logger = LoggerSrv.LoggerManager().get_logger("ScriptsRunner")
 
     def get_all_scripts(self, ignore_config=False):
         self.logger.debug("Getting all scripts")
@@ -40,7 +40,7 @@ class ScriptsRunner:
             self.processes[item] = proc
             await proc.wait()
         else:
-            self.logger.warn(f"Tried to run script {item} but it was already running")
+            self.logger.warning(f"Tried to run script {item} but it was already running")
 
     def stop_all_scripts(self):
         self.logger.info("Stopping all scripts")
