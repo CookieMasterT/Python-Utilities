@@ -1,4 +1,7 @@
 {
   "Utilities.InstaPicPaste.Keybinding": "control + 0x5B + i",
-  "Utilities.InstaPicPaste.Enabled": true
+  "Utilities.InstaPicPaste.Enabled": true,
+  "Utilities.ClipboardRegex.Keybindings": ["control + alt + 1"],
+  "Utilities.ClipboardRegex.Expressions": ["^\"(?P<_>.*)\"$"],
+  "Utilities.ClipboardRegex.Enabled": true
 }

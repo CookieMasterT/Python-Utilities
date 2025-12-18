@@ -86,5 +86,6 @@ def delete(resource: str):
         try:
             del data[resource]
         except KeyError:
+            logger.debug(f"Key {resource} not found in config file")
             pass  # The value that you are trying to delete does not exist, this is passed to guarantee idempotence
         json.dump(data, open(CONFIGPATH, "w"))
