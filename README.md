@@ -35,7 +35,7 @@ A python repository to store and manage python utilities for Windows QoL, think 
    - Add a shortcut to `App\Utilities\UtilityRun.pyw` in Windows startup folder
    - The windows startup folder is usually located at:
      - `C:\Users\%USER%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup`
-     - Or to quickly navigate use run : `Windows + R` → `shell:startup`
+     - Or to quickly navigate use run (Windows + R) → `shell:startup`
    - Afterward run `UtilityRun.pyw` or Reboot the system.
 
 ## Project Structure
