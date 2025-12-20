@@ -8,10 +8,10 @@ from typing import Union
 from App.InternalScripts.Logging import LoggerSrv
 
 
-CONFIGPATH = Path(__file__).parents[2].joinpath(r'.\config.json')
-DEFAULTCONFIGPATH = Path(__file__).parents[0].joinpath(r'.\default_config.json')
+CONFIGPATH = Path(__file__).parents[2] / "config.json"
+DEFAULTCONFIGPATH = Path(__file__).parent / "default_config.json"
 
-LEGALJSONTYPES = Union[str | int | float | bool | list]
+LEGALJSONTYPES = str | int | float | bool | list
 
 logger = LoggerSrv.LoggerManager().get_logger("ConfigREST")
 
@@ -37,12 +37,15 @@ def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:
 
 def _fetch_config_from_file(resource: str, file_path: Path) -> Union[LEGALJSONTYPES, None]:
     try:
-        config = json.load(open(file_path))
+        with open(file_path) as f:
+            config = json.load(f)
         return config[resource]
     except json.JSONDecodeError:
-        return None  # config file is empty, or has an invalid json
+        logger.debug("config file is empty, or has an invalid json")
+        return None
     except KeyError:
-        return None  # config does not contain this option
+        logger.debug("config does not contain this option")
+        return None
 
 
 def _fetch_all_config(default_config_path: Path, config_path: Path) -> LEGALJSONTYPES:
@@ -50,9 +53,10 @@ def _fetch_all_config(default_config_path: Path, config_path: Path) -> LEGALJSON
     dicts = []
     for file in files:
         try:
-            dicts.append(json.load(open(file)))
-        except json.JSONDecodeError:
-            dicts.append({})  # config file is empty or broken, so we append an empty dictionary
+            with open(file) as f:
+                dicts.append(json.load(f))
+        except json.JSONDecodeError:  # config file is empty or broken, so we append an empty dictionary
+            dicts.append({})
     final_dict = dicts[0]
     for entry in dicts[1]:
         final_dict[entry] = dicts[1][entry]
@@ -61,14 +65,16 @@ def _fetch_all_config(default_config_path: Path, config_path: Path) -> LEGALJSON
 
 def put(resource: str, value: LEGALJSONTYPES):
     """
-    Inserts a value into the config file
+    Inserts a value into the config file or updates it
     :param resource: The resource to which to assign the value, example: "Utilities.InstaPicPaste.Use"
     :param value: The value to set the key to
     """
     logger.debug(f"Setting {resource} to {value}")
-    data = json.load(open(CONFIGPATH, "r"))
+    with open(CONFIGPATH, "r") as f:
+        data = json.load(f)
     data[resource] = value
-    json.dump(data, open(CONFIGPATH, "w"))
+    with open(CONFIGPATH, "w") as f:
+        json.dump(data, f)
 
 
 def delete(resource: str):
@@ -80,12 +86,15 @@ def delete(resource: str):
     """
     logger.debug(f"Deleting {resource}")
     if resource == "*":
-        json.dump({}, open(CONFIGPATH, "w"))
+        with open(CONFIGPATH, "w") as f:
+            json.dump({}, f)
     else:
-        data = json.load(open(CONFIGPATH, "r"))
+        with open(CONFIGPATH, "r") as f:
+            data = json.load(f)
         try:
             del data[resource]
-        except KeyError:
+        except KeyError:  # The value that you are trying to delete does not exist
+            # this is passed to guarantee idempotence
             logger.debug(f"Key {resource} not found in config file")
-            pass  # The value that you are trying to delete does not exist, this is passed to guarantee idempotence
-        json.dump(data, open(CONFIGPATH, "w"))
+        with open(CONFIGPATH, "w") as f:
+            json.dump(data, f)
