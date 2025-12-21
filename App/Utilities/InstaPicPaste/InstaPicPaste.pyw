@@ -16,14 +16,31 @@ def image_to_file() -> None:
     full_path = start_path / file_path
     try:
         im.save(full_path, 'PNG')
-        logger.info(f"Succesfully saved {full_path}")
-    except (IOError, AttributeError):
-        logger.warning("Tried to convert, but the clipboard contained a non-image")
-    subprocess.run(
-        ["powershell", "Set-Clipboard", "-LiteralPath", str(full_path)],
-        check=True,
-        capture_output=True
-    )
+        logger.info(f"Succesfully saved image from clipboard into: {full_path}")
+    except AttributeError as e:
+        logger.warning("Tried to convert clipboard image to file, but the clipboard contained a non-image")
+        logger.warning(e)
+        return
+    except IOError as e:
+        logger.error("Path is invalid or the program does not have access to its own directory")
+        logger.error(e)
+        raise IOError("The program cannot failed to save a file inside itself"
+                      "(Is the directory access locked, readonly or otherwise unusable?)")
+    try:
+        subprocess.run(
+            ["powershell", "Set-Clipboard", "-LiteralPath", str(full_path)],
+            check=True,
+            capture_output=True,
+        )
+        logger.info("succesfully copied file into clipboard")
+    except subprocess.CalledProcessError as e:
+        logger.error(f'Powershell failed with return code: "{e.returncode}"')
+        subprocess_output = ""
+        if e.stdout:
+            subprocess_output += e.stdout.decode()
+        if e.stderr:
+            subprocess_output += e.stderr.decode()
+        logger.error(f'subprocess output: "{subprocess_output}"')
 
 
 def run() -> None:

@@ -31,7 +31,8 @@ def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:
         if answer is None and check_both:
             answer = _fetch_config_from_file(resource, DEFAULTCONFIGPATH)
             if answer is None:
-                raise NotImplementedError("default_config.json is missing values or is invalid (did you modify it?)")
+                logger.error("default_config.json is missing values or is invalid (did you modify it?)")
+                raise NotImplementedError("Attempted to fetch a config value that does not exist or is invalid")
     return answer
 
 
@@ -40,11 +41,13 @@ def _fetch_config_from_file(resource: str, file_path: Path) -> Union[LEGALJSONTY
         with open(file_path) as f:
             config = json.load(f)
         return config[resource]
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
         logger.debug("config file is empty, or has an invalid json")
+        logger.debug(e)
         return None
-    except KeyError:
+    except KeyError as e:
         logger.debug("config does not contain this option")
+        logger.debug(e)
         return None
 
 
@@ -55,7 +58,9 @@ def _fetch_all_config(default_config_path: Path, config_path: Path) -> LEGALJSON
         try:
             with open(file) as f:
                 dicts.append(json.load(f))
-        except json.JSONDecodeError:  # config file is empty or broken, so we append an empty dictionary
+        except json.JSONDecodeError as e:  # config file is empty or broken, so we append an empty dictionary
+            logger.warning("Config file is empty or invalid")
+            logger.warning(e)
             dicts.append({})
     final_dict = dicts[0]
     for entry in dicts[1]:
@@ -93,8 +98,9 @@ def delete(resource: str):
             data = json.load(f)
         try:
             del data[resource]
-        except KeyError:  # The value that you are trying to delete does not exist
+        except KeyError as e:  # The value that you are trying to delete does not exist
             # this is passed to guarantee idempotence
             logger.debug(f"Key {resource} not found in config file")
+            logger.debug(e)
         with open(CONFIGPATH, "w") as f:
             json.dump(data, f)

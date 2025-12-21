@@ -23,11 +23,14 @@ class ScriptsRunner:
         for item in os.listdir():
             if ignore_config or item in enabled_utilities:
                 scripts.append(item)
+        if len(scripts) == 0:
+            self.logger.error("No scripts have been found")
         return scripts
 
     async def run_all_scripts_async(self) -> None:
-        self.logger.info("Running all available scripts")
-        for item in self.get_all_scripts():
+        scripts = self.get_all_scripts()
+        self.logger.info(f"Running all available scripts ({len(scripts)} found)")
+        for item in scripts:
             await self.run_script_async(item)
         for proc in self.processes:
             try:

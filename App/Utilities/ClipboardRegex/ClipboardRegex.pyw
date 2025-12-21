@@ -34,10 +34,12 @@ def regex_clipboard_text(expression: str):
         else:
             logger.warning(f'"{data.replace("\n", "").replace("\r", "")}" did not match "{expression}",'
                            f' therefore the clipboard text was unmodified')
-    except TypeError:
+    except TypeError as e:
         logger.warning("Tried to fetch clipboard data, but the clipboard contained non-text")
+        logger.warning(e)
     except win32api.error as e:
-        logger.warning(f"win32api error: {e}")
+        logger.warning(f"win32api has failed")
+        logger.warning(e)
     finally:
         win32clipboard.CloseClipboard()
 
@@ -47,7 +49,8 @@ def run() -> None:
     set_keybindings = ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Keybindings')
     set_expressions = ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.Expressions')
     if len(set_expressions) != len(set_keybindings):
-        raise NotImplementedError("default_config.json is incorrect in some way "
+        logger.error(f"Number of expressions and keybindings do not match")
+        raise NotImplementedError("default_config.json or / and config.json is incorrect in some way "
                                   "(set_keybindings and set_expressions are different lengths)")
     set_rules = []
     for x in range(len(set_keybindings)):  # The lists are interleaved to allow iterating through both of them at once
