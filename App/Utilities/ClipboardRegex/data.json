@@ -1,0 +1,6 @@
+{
+  "FileName": "ClipboardRegex",
+  "LongName": "Clipboard Regular Expressions",
+  "Description": "A very fast way to run custom regular expressions on text",
+  "ConfigInputs": {}
+}
