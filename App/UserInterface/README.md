@@ -1,1 +1,1 @@
-nothing to see here, yet
+The user interface that allows management and configuration of the utilities

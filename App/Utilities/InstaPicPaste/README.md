@@ -6,3 +6,6 @@ Will look for any image in the clipboard and convert it into a file named "Image
 
 Intended to be used with any screenshot tool to quickly save the image by pasting it into the target directory
 without having to navigate to the folder via GUI.
+
+IMAGES FOLDER IS NOT PERSISTENT
+all files within will be deleted on each invocation of the script

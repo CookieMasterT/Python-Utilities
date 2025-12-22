@@ -1,3 +1,4 @@
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -11,11 +12,22 @@ logger = LoggerSrv.LoggerManager().get_logger("InstaPicPaste")
 
 def image_to_file() -> None:
     im = ImageGrab.grabclipboard()
-    start_path = Path(__file__).parents[0]
-    file_path = 'Image.png'
+
+    file_name = ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.FileName')
+    file_format = ConfigREST.get(f'Utilities.{Path(__file__).name.split('.')[0]}.FileFormat')
+
+    start_path = Path(__file__).parents[0] / "Images"
+    file_path = f"{file_name}.{file_format.lower()}"
     full_path = start_path / file_path
+
+    for f in os.listdir(start_path):
+        file_path = start_path / f
+        if not file_path == full_path:
+            logger.info(fr'Cleared "{f}" from \Images')
+            os.remove(file_path)
+
     try:
-        im.save(full_path, 'PNG')
+        im.save(full_path, file_format)
         logger.info(f"Succesfully saved image from clipboard into: {full_path}")
     except AttributeError as e:
         logger.warning("Tried to convert clipboard image to file, but the clipboard contained a non-image")

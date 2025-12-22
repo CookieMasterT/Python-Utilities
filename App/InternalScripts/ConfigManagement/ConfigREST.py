@@ -32,7 +32,8 @@ def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:
             answer = _fetch_config_from_file(resource, DEFAULTCONFIGPATH)
             if answer is None:
                 logger.error("default_config.json is missing values or is invalid (did you modify it?)")
-                raise NotImplementedError("Attempted to fetch a config value that does not exist or is invalid")
+                raise NotImplementedError(f"Attempted to fetch a config value that does not exist or is invalid "
+                                          f"({resource})")
     return answer
 
 

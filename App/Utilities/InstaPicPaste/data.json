@@ -2,6 +2,6 @@
   "FileName": "InstaPicPaste",
   "LongName": "Instant Picture Paste",
   "Description": "A tool to quickly to quickly format Images in your clipboard into png files.",
-  "ConfigInputs": { "File Name":["Text", "The default name of the generated file"],
-                    "File Format":["Enum", "", "PNG", "GIF", "JPEG", "WebP"]}
+  "ConfigInputs": { "File Name":["Text", "The default name of the generated file", "Utilities.InstaPicPaste.FileName"],
+                    "File Format":["Enum", "", "Utilities.InstaPicPaste.FileFormat" , "PNG", "GIF", "JPEG", "WebP"]}
 }
