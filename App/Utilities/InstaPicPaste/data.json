@@ -2,5 +2,6 @@
   "FileName": "InstaPicPaste",
   "LongName": "Instant Picture Paste",
   "Description": "A tool to quickly to quickly format Images in your clipboard into png files.",
-  "ConfigInputs": {"File Name":"string", "File Format":["PNG", "GIF", "JPEG", "WebP"]}
+  "ConfigInputs": { "File Name":["Text", "The default name of the generated file"],
+                    "File Format":["Enum", "", "PNG", "GIF", "JPEG", "WebP"]}
 }
