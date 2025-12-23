@@ -1,12 +1,18 @@
 import json
 from pathlib import Path
+from tkinter import *
 from tkinter import ttk
 from typing import Any
 from App.InternalScripts.Logging import LoggerSrv
+from App.InternalScripts.ConfigManagement import ConfigREST
 
 
 class UtilitySettingsLoader:
     logger = LoggerSrv.LoggerManager().get_logger("LoadUtilitySettings")
+
+    def __init__(self) -> None:
+        # tkinter excepts the stringvars to be persistent.
+        self.persistent_config_vars = []
 
     def load(self, utility_name, mainframe) -> Any:
         self.logger.info(f'Loading data for utility: "{utility_name}"')
@@ -35,6 +41,22 @@ class UtilitySettingsLoader:
             (ttk.Label(left, text=str(data["ConfigInputs"][ConfigOption][1]))
              .grid(column=0, row=1, sticky="W E"))
 
-            (ttk.Label(option, anchor="e", text=data["ConfigInputs"][ConfigOption][0])
-             .grid(column=1, row=0, sticky="N S E W"))
+            config_input = None
+            if data["ConfigInputs"][ConfigOption][0] == 'Text':
+                self.persistent_config_vars.append(
+                    StringVar(value=ConfigREST.get(str(data["ConfigInputs"][ConfigOption][2]))))
+
+                config_input = ttk.Entry(option, textvariable=self.persistent_config_vars[i])
+                config_input.grid(column=1, row=0, sticky="E")
+            elif data["ConfigInputs"][ConfigOption][0] == 'Enum':
+                self.persistent_config_vars.append(
+                    StringVar(value=ConfigREST.get(str(data["ConfigInputs"][ConfigOption][2]))))
+                config_input = ttk.Combobox(option, textvariable=self.persistent_config_vars[i],
+                                            values=data["ConfigInputs"][ConfigOption][3:],
+                                            state="readonly")
+                config_input.grid(column=1, row=0, sticky="E")
+            else:
+                self.persistent_config_vars.append(StringVar())
+            # (ttk.Label(option, anchor="e", text=data["ConfigInputs"][ConfigOption][0])
+            # .grid(column=1, row=0, sticky="N S E W"))
             i += 1
