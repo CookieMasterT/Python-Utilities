@@ -1,4 +1,5 @@
 import json
+from time import time
 from pathlib import Path
 from tkinter import *
 from tkinter import ttk
@@ -9,10 +10,17 @@ from App.InternalScripts.ConfigManagement import ConfigREST
 
 class UtilitySettingsLoader:
     logger = LoggerSrv.LoggerManager().get_logger("LoadUtilitySettings")
+    SAVE_COOLDOWN = 3000  # 3 seconds
 
     def __init__(self) -> None:
         # tkinter excepts the stringvars to be persistent.
         self.persistent_config_vars = []
+        self.save_timer = time()
+
+    def on_change_config(self, i, location) -> None:
+        value = self.persistent_config_vars[i].get()
+        self.logger.info(f'Changing "{location}" to "{value}"')
+        ConfigREST.put(location, value)
 
     def load(self, utility_name, mainframe) -> Any:
         self.logger.info(f'Loading data for utility: "{utility_name}"')
@@ -41,7 +49,6 @@ class UtilitySettingsLoader:
             (ttk.Label(left, text=str(data["ConfigInputs"][ConfigOption][1]))
              .grid(column=0, row=1, sticky="W E"))
 
-            config_input = None
             if data["ConfigInputs"][ConfigOption][0] == 'Text':
                 self.persistent_config_vars.append(
                     StringVar(value=ConfigREST.get(str(data["ConfigInputs"][ConfigOption][2]))))
@@ -57,6 +64,10 @@ class UtilitySettingsLoader:
                 config_input.grid(column=1, row=0, sticky="E")
             else:
                 self.persistent_config_vars.append(StringVar())
+            self.persistent_config_vars[i].trace_add("write",
+                                                     lambda *args, _i=i,
+                                                     save_location=data["ConfigInputs"][ConfigOption][2]:
+                                                     self.on_change_config(_i, save_location))
             # (ttk.Label(option, anchor="e", text=data["ConfigInputs"][ConfigOption][0])
             # .grid(column=1, row=0, sticky="N S E W"))
             i += 1
