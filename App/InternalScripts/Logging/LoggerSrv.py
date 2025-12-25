@@ -3,32 +3,24 @@ import time
 from pathlib import Path
 
 
-class LoggerManager:
+def get_logger(name: str):
     """
-    Ensures logging is configured properly and only setup once
-    This should be used as the only source of logging
+    Returns a logger for the given name
+    :param name: Name of the logger
+    :return: Configured logger fom the logging module
     """
-    Initialized = False
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
 
-    def get_logger(self, name: str):
-        """
-        Returns a logger for the given name
-        :param name: Name of the logger
-        :return: Configured logger fom the logging module
-        """
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.INFO)
+    logger.debug(f"Started {time.ctime()}")
 
-        if not self.Initialized:
-            self.Initialized = True
-            logger.info(f"Started {time.ctime()}")
-            file_handler = logging.FileHandler(Path(__file__).parents[0] / 'Logs/debug.txt', mode='a')
-            console_handler = logging.StreamHandler()
-            handlers = [file_handler, console_handler]
+    file_handler = logging.FileHandler(Path(__file__).parents[0] / 'Logs/debug.txt', mode='a')
+    console_handler = logging.StreamHandler()
+    handlers = [file_handler, console_handler]
 
-            formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-            for handler in handlers:
-                handler.setLevel(logging.INFO)
-                handler.setFormatter(formatter)
-                logger.addHandler(handler)
-        return logger
+    formatter = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+    for handler in handlers:
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+    return logger
