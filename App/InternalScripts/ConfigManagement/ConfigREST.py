@@ -7,13 +7,12 @@ from pathlib import Path
 from typing import Union
 from App.InternalScripts.Logging import LoggerSrv
 
-
 CONFIGPATH = Path(__file__).parents[2] / "config.json"
 DEFAULTCONFIGPATH = Path(__file__).parent / "default_config.json"
 
 LEGALJSONTYPES = str | int | float | bool | list
 
-logger = LoggerSrv.LoggerManager().get_logger("ConfigREST")
+logger = LoggerSrv.get_logger("ConfigREST")
 
 
 def get(resource: str, check_both: bool = True) -> LEGALJSONTYPES:

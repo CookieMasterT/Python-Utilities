@@ -1,13 +1,36 @@
 import asyncio
 import os
 import re
+from time import time
+from pathlib import Path
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
+
+HEART_BEAT_INTERVAL = 2
+
+
+async def heart_beat_async() -> None:
+    while True:
+        with open(Path(__file__).parent / "UtilityRun.lock", 'w') as lock:
+            lock.write(str(time()))
+        await asyncio.sleep(HEART_BEAT_INTERVAL)
+
+
+def is_running() -> bool:
+    """
+    Checks whether UtilityRun is running.
+    """
+    with open(Path(__file__).parent / "UtilityRun.lock", 'r') as lock:
+        lock_value = lock.read()
+        if time() - float(lock_value) >= HEART_BEAT_INTERVAL * 2:
+            return False
+        else:
+            return True
 
 
 class ScriptsRunner:
     processes = {}
-    logger = LoggerSrv.LoggerManager().get_logger("ScriptsRunner")
+    logger = LoggerSrv.get_logger("ScriptsRunner")
 
     def get_all_scripts(self, ignore_config: bool = False):
         self.logger.debug("Getting all scripts")
@@ -28,7 +51,14 @@ class ScriptsRunner:
         return scripts
 
     async def run_all_scripts_async(self) -> None:
+        """
+        Runs all the Utilities that are currently defined by the config files to be enabled
+        Additionally runs a service that updates the status of the script (that it is currently running)
+        and waits infinitely.
+        """
         scripts = self.get_all_scripts()
+        self.logger.info("Starting Heartbeat")
+        asyncio.create_task(heart_beat_async())
         self.logger.info(f"Running all available scripts ({len(scripts)} found)")
         for item in scripts:
             await self.run_script_async(item)

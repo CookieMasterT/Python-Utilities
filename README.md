@@ -46,6 +46,7 @@ App/
 │   ├───ConfigManagement/
 │   └───Logging/
 ├───UserInterface/
+│   └───Modules/
 └───Utilities/
 ```
 

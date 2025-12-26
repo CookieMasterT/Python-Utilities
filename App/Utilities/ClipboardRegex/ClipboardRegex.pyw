@@ -8,7 +8,7 @@ import global_hotkeys
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
 
-logger = LoggerSrv.LoggerManager().get_logger("ClipboardRegex")
+logger = LoggerSrv.get_logger("ClipboardRegex")
 
 
 def regex_clipboard_text(expression: str):

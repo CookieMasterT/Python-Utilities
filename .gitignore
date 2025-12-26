@@ -1,5 +1,7 @@
 App/Utilities/InstaPicPaste/Images/*
+App/Utilities/UtilityRun.lock
 App/InternalScripts/Logging/Logs/*
+App/config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

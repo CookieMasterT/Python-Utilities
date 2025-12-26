@@ -7,7 +7,7 @@ from PIL import ImageGrab
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
 
-logger = LoggerSrv.LoggerManager().get_logger("InstaPicPaste")
+logger = LoggerSrv.get_logger("InstaPicPaste")
 
 
 def image_to_file() -> None:

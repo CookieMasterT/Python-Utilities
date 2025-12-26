@@ -1,29 +1,29 @@
 import json
-from time import time
 from pathlib import Path
 from tkinter import *
 from tkinter import ttk
-from typing import Any
 from App.InternalScripts.Logging import LoggerSrv
 from App.InternalScripts.ConfigManagement import ConfigREST
 
 
 class UtilitySettingsLoader:
-    logger = LoggerSrv.LoggerManager().get_logger("LoadUtilitySettings")
-    SAVE_COOLDOWN = 3000  # 3 seconds
+    logger = LoggerSrv.get_logger("UtilitySettingsLoader")
 
     def __init__(self) -> None:
         # tkinter excepts the stringvars to be persistent.
         self.persistent_config_vars = []
-        self.save_timer = time()
 
     def on_change_config(self, i, location) -> None:
         value = self.persistent_config_vars[i].get()
         self.logger.info(f'Changing "{location}" to "{value}"')
         ConfigREST.put(location, value)
 
-    def load(self, utility_name, mainframe) -> Any:
+    def load(self, utility_name, mainframe) -> None:
         self.logger.info(f'Loading data for utility: "{utility_name}"')
+
+        for widget in mainframe.winfo_children():
+            widget.destroy()
+
         data = {}
         with open(Path(__file__).parents[2] / f"Utilities/{utility_name}/data.json") as f:
             data = json.load(f)
@@ -68,6 +68,4 @@ class UtilitySettingsLoader:
                                                      lambda *args, _i=i,
                                                      save_location=data["ConfigInputs"][ConfigOption][2]:
                                                      self.on_change_config(_i, save_location))
-            # (ttk.Label(option, anchor="e", text=data["ConfigInputs"][ConfigOption][0])
-            # .grid(column=1, row=0, sticky="N S E W"))
             i += 1
