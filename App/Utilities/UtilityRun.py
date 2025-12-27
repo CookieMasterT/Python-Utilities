@@ -20,12 +20,15 @@ def is_running() -> bool:
     """
     Checks whether UtilityRun is running.
     """
-    with open(Path(__file__).parent / "UtilityRun.lock", 'r') as lock:
-        lock_value = lock.read()
-        if time() - float(lock_value) >= HEART_BEAT_INTERVAL * 2:
-            return False
-        else:
-            return True
+    if os.path.exists(Path(__file__).parent / "UtilityRun.lock"):
+        with open(Path(__file__).parent / "UtilityRun.lock", 'r') as lock:
+            lock_value = lock.read()
+            if time() - float(lock_value) >= HEART_BEAT_INTERVAL * 2:
+                return False
+            else:
+                return True
+    else:
+        return False
 
 
 class ScriptsRunner:
@@ -43,7 +46,7 @@ class ScriptsRunner:
             match = re.fullmatch(expression, option)
             if match and config[option] is True:
                 enabled_utilities.append(match.group('UtilityName'))
-        for item in os.listdir():
+        for item in os.listdir(Path(__file__).parent):
             if ignore_config or item in enabled_utilities:
                 scripts.append(item)
         if len(scripts) == 0:
@@ -56,22 +59,28 @@ class ScriptsRunner:
         Additionally runs a service that updates the status of the script (that it is currently running)
         and waits infinitely.
         """
-        scripts = self.get_all_scripts()
-        self.logger.info("Starting Heartbeat")
-        asyncio.create_task(heart_beat_async())
-        self.logger.info(f"Running all available scripts ({len(scripts)} found)")
-        for item in scripts:
-            await self.run_script_async(item)
-        for proc in self.processes:
-            try:
-                await self.processes[proc].wait()
-            except asyncio.CancelledError:
-                self.logger.error("Program got Interrupted by user")
+        if not is_running():
+            scripts = self.get_all_scripts()
+            self.logger.info("Starting Heartbeat")
+            asyncio.create_task(heart_beat_async())
+            self.logger.info(f"Running all available scripts ({len(scripts)} found)")
+            for item in scripts:
+                await self.run_script_async(item)
+            for proc in self.processes:
+                try:
+                    await self.processes[proc].wait()
+                except asyncio.CancelledError:
+                    self.logger.error("Program got Interrupted by user")
+        else:
+            self.logger.warning("Tried to run all scripts but they were already running")
 
     async def run_script_async(self, item: str):
         if item not in self.processes:
             self.logger.info(f"Running Script {item}")
-            proc = await asyncio.create_subprocess_exec("python", f"./{item}/{item}.pyw")
+            proc = await asyncio.create_subprocess_exec(
+                # creationflags=0x08000000 hides the console windows
+                "python", Path(__file__).parent / f"{item}/{item}.pyw",
+                creationflags=0x08000000)
             self.processes[item] = proc
         else:
             self.logger.warning(f"Tried to run script {item} but it was already running")
