@@ -1,10 +1,17 @@
+import sys
 import asyncio
 import os
 import re
 from time import time
 from pathlib import Path
+
+original_path = sys.path.copy()
+sys.path.append(str(Path(__file__).parents[2]))
+
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
+
+sys.path = original_path
 
 HEART_BEAT_INTERVAL = 2
 
@@ -23,10 +30,11 @@ def is_running() -> bool:
     if os.path.exists(Path(__file__).parent / "UtilityRun.lock"):
         with open(Path(__file__).parent / "UtilityRun.lock", 'r') as lock:
             lock_value = lock.read()
+            if lock_value == "":
+                return False
             if time() - float(lock_value) >= HEART_BEAT_INTERVAL * 2:
                 return False
-            else:
-                return True
+            return True
     else:
         return False
 
@@ -68,9 +76,12 @@ class ScriptsRunner:
                 await self.run_script_async(item)
             for proc in self.processes:
                 try:
+                    self.logger.debug(f"Waiting for {proc} process to finish")
                     await self.processes[proc].wait()
+                    self.logger.debug(f"Finished {proc} process")
                 except asyncio.CancelledError:
                     self.logger.error("Program got Interrupted by user")
+                    return
         else:
             self.logger.warning("Tried to run all scripts but they were already running")
 

@@ -1,11 +1,18 @@
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 import global_hotkeys
 from PIL import ImageGrab
+
+original_path = sys.path.copy()
+sys.path.append(str(Path(__file__).parents[3]))
+
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
+
+sys.path = original_path
 
 logger = LoggerSrv.get_logger("InstaPicPaste")
 

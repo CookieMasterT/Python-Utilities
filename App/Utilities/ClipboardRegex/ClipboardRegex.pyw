@@ -1,12 +1,18 @@
 import re
+import sys
 import time
-from pathlib import Path
-
 import win32api
 import win32clipboard
 import global_hotkeys
+from pathlib import Path
+
+original_path = sys.path.copy()
+sys.path.append(str(Path(__file__).parents[3]))
+
 from App.InternalScripts.ConfigManagement import ConfigREST
 from App.InternalScripts.Logging import LoggerSrv
+
+sys.path = original_path
 
 logger = LoggerSrv.get_logger("ClipboardRegex")
 
