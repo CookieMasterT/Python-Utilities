@@ -10,3 +10,4 @@ and a data.json with a
    - The first value is the type of the value (Text, Int, Enum, etc.)
    - The second value is an optional description
    - The third value is Config key that will be saved and will be retrieved via ConfigREST.
+   - Any extra values are restrictions or options for the value type (ex. The values that an Enum will accept)

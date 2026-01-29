@@ -2,5 +2,9 @@
   "FileName": "ClipboardRegex",
   "LongName": "Clipboard Regular Expressions",
   "Description": "A very fast way to run custom regular expressions on text",
-  "ConfigInputs": {}
+  "ConfigInputs": { "Regular expressions":
+   ["KeyboardExtraOptions",
+     "The Regex needs to return a group in order to work",
+     ["Utilities.ClipboardRegex.Keybindings", "Utilities.ClipboardRegex.Expressions"],
+     "Text"]}
 }
